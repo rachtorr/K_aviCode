@@ -19,37 +19,32 @@
 rm(list = ls())
 
 #install necessary packages- packages increase the functionality of R/RStudio
-install.packages('tidyverse', 'lubridate', 'gganimate')
+install.packages('tidyverse', 'lubridate', 'gganimate', 'janitor')
 # load necessary libraries- libraries are the installed packages
-library(tidyverse)
-library(lubridate)
-library(gganimate) 
-# the following message was included after loading gganimate 
-# No renderer backend detected. gganimate will default to writing frames to separate files
-# Consider installing:
-#   - the `gifski` package for gif output
-# - the `av` package for video output
-# and restarting the R session 
-
-
+library(tidyverse) # used for 'tidying' data: wrangling, analysis, visualizing 
+library(lubridate) # used to handle data as dates 
+library(janitor)   # used to explore and clean data 
+library(gganimate) # what is gganimate used for? 
 
 # set working directory- the wd is the folder that your related files will be contained in
   # it's important that each class / project has a specific
   # folder on your computer to maintain organization
-setwd("~/Documents/K_avi_Tribe_RT/")
+setwd("~/Documents/GitHub/K_aviCode/")
+# if using github project or working from posit cloud, don't need to run setwd()
 
-# read in CSV file that we want to work with- make sure it is downloaded to your working directory
+
+# read in CSV file that we want to work with - should be located in your working directory
 water <- read.csv("K_avi Tribe Water Quality Dataset.csv")
 
 ##
 #### Examine Dataset ####
 ##
 
-# use str() or glimpse() to examine the structure of the dataset
+# str() and glimpse() are functions. we input our data set and they return an output to examine the structure of the dataset
 str(water)
 glimpse(water)
 
-# would also encourage them to use View(water) so that they can see it's literally a data frame 
+# would also encourage them to use View(water) so that they can see it's like excel data 
 # or also head(water)
 
 # how many rows and how many columns are there?
@@ -61,45 +56,50 @@ glimpse(water)
 
 
 
-##
+#######################
 #### Clean Up Data ####
-##
+#######################
 
 ## rename column names
 # see what names of columns are
 names(water)
-# there are 20 columns, but only 9 of them contain data
+# there are 20 columns, but only 9 of them contain data (NA means Not Available)
 
-#before doing the next step, introduce c() and the idea of a vector as a list 
-# example of a vector 
-mylist = c("a", "b","c")
+# the output of names(water) is a list 
+# we can make our own lists using c(); 
+# for example here is list, na_names, of the names of columns we don't want 
+na_names <- c("X", "X.1", "X.2", "X.3", "X.4", "X.5", "X.6", "X.7",
+  "X.8", "X.9", "X.10")
+na_names
 
 # remove the 11 unnecessary columns 2 ways
 
-
 # 1) you can use Tidyverse and the column names specifically to remove the columns
 
-### list of columns names using c(), the minus sign means we are NOT selecting 
-### select() is a tidyverse function 
-water <- water %>%
-  select(-c("X", "X.1", "X.2", "X.3", "X.4", "X.5", "X.6", "X.7",
-            "X.8", "X.9", "X.10"))
-# 2) or you can do this by removing columns by their column number
-water <- water[,-c(10:20)]
+### select() is a tidyverse function, the minus sign means we are NOT selecting 
+water_clean <- water %>% 
+  select(-all_of(na_names))
 
-# now we're ready to actually rename the remaining columns
-colnames(water) <- c("sample_location", "longitude", "latitude", "date",
-                     "DO", "water_temp_C", "water_temp_F", "specific_conductivity",
-                     "discharge")
+# for tidyverse functions, we can use a pipe (%>%) which is an operator that takes the dataframe and performs a function on it 
 
-# also explanation why change names? 
+# we can also do this with the janitor package, remove_empty() which identifies NAs and removes
+water_clean <- water %>% 
+  remove_empty("cols")
+
+# now look at your data water_clean using one of the previous functions 
+
+# why change names? 
 ### - it's easier to not have uppercase letters 
 ### - we want it to be all one word with no spaces or periods 
 ### - standard practice is _ and not . between words 
-### - some words are just too long we don't want to type them out i.e. temperature = 'temp'
 
-# can also combine selecting columns and renaming them, but don't want to give too many options
-water_filt <- water %>%
+# here we can use clean_names() from janitor library
+water_clean <- clean_names(water_clean)
+
+
+# we can also do this manually by using select() from tidyverse, and rename the columns selected
+### - some words we might want to shorten i.e. temperature = 'temp'
+water_tidy <- water %>%
   select(sample_location = "Sample.Location",
          longitude = "Longitude",
          latitude = "Latitude",
@@ -110,52 +110,48 @@ water_filt <- water %>%
          specific_conductivity = "Specific.Conductance.umhos",
          discharge = "Discharge.ft3.sec")
 
-# here we can instead use clean_names() from janitor library
-water_filt <- clean_names(water) # do this after selecting which columns you want 
-  
+# we will work with tidy going forward, can delete water_clean example - they are the same just different column names 
+rm(water_clean)
 
-# something to note - change name of data frame, so that if you mess up you can start again without scrolling back up to read.csv 
 
-## remove repeated column names throughout dataframe (df)
+# let's look at the summarized dataset  
+summary(water_tidy) # when we run summary, all columns that we want to be numeric are listed as characters - why? 
+
 # here we could manually look for the repeated column headers that are throughout
 # the dataset OR we could use text recognition to find these rows
-# rows we're concerned about: 133, 266, 399, 532. <-- how did we know this? was it opened in excel first 
+# rows we're concerned about: 133, 266, 399, 532. <-- how did we know this? 
 
-# why does this matter? 
-summary(water_filt) # when we run summary, which we will see more later, all columns that we have seen as numeric are listed as characters - why? 
+# identify duplicates 
+get_dupes(water_tidy) # this is a function from janitor to identify any duplicated rows 
+# in the output we see that despite having mostly numeric values, the lines that are duplicated have the col names listed again - we want to remove these 
+
 
 # 1) you can use Tidyverse to remove all the rows that have specific text in a specific column
 ## introduce filter() here 
-water_filt <- water_filt %>%
-  filter(sample_location != "Sample Location")
+water_filt <- water_tidy %>%
+  filter(sample_location != "Sample Location") # filter function takes a criteria for a column and checks whether it is true or not, here "!=" means it is not equal to 
 
-# 2) or you could manually sort the dataframe and determine these 4 rows
-water_filt <- water_filt[-c(133, 266, 399, 532),] # then remove those ones specifically
-
-# another option - how do we know to filter out where it says "Sample Location" ?
-# identify duplicates 
-water_filt[duplicated(water_filt)==TRUE,]
-# then do the filter like in option 1 above once identifying that duplicates matched the col name
-
-# explain why 
-# dates in R are a separate data category 
 # run summary again
 summary(water_filt)
 
+# dates in R are a separate data category 
 ## fix dates that are incorrect
-water_filt$date <- mdy(water_filt$date)
+water_filt$date <- mdy(water_filt$date) # mdy() is a function from lubridate package
 # now run summary again and look at 'date' column
 summary(water_filt)
 
 
 ## fix structure of each column as we'll need it for analysis
-# DO, water_temp_C, water_temp_F, specific_conductivity, discharge are all
-# columns that need to be numeric values
-water_filt$DO <- as.numeric(water_filt$DO)
-water_filt$water_temp_C <- as.numeric(water_filt$water_temp_C)
-water_filt$water_temp_F <- as.numeric(water_filt$water_temp_F)
-water_filt$specific_conductivity <- as.numeric(water_filt$specific_conductivity)
-water_filt$discharge <- as.numeric(water_filt$discharge)
+#  even though we removed the col names with characters, DO, water_temp_C, water_temp_F, specific_conductivity, discharge are all columns that need to be numeric values ]
+# we can do this using tidyverse function mutate 
+water_filt <- water_filt %>% mutate(
+  DO = as.numeric(DO),
+  water_temp_C = as.numeric(water_temp_C),
+  water_temp_F = as.numeric(water_temp_F),
+  specific_conductivity = as.numeric(specific_conductivity),
+  discharge = as.numeric(discharge)
+)
+
 
 # confirm structure of all columns in dataframe
 str(water_filt) # note the type of data we now have - character, date, numeric - does it make sense which is which ? 
@@ -165,29 +161,35 @@ summary(water_filt)
 # for analysis we'll need to group data by year, so let's make one more column
 # that is the year the sample was collected
 # because our date column is the type 'Date', we can use the 'year' function from lubridate to extract the year and make it another column 
-water_filt$year <- year(water_filt$date)
+water_filt$year <- year(water_filt$date) 
+# this is another case where mutate can be used 
+water_filt <- water_filt %>% mutate(year = year(date))
 
-##** would encourage students to look at data using str() or head() after each time they change it 
+## again look at data to see how it has been changed 
 
 # write the data frame as another CSV so this cleaned data set can be used
 # for other analyses
 write.csv(water_filt, file = "K'avi Tribe Water Quality Dataset_clean.csv")
 
 
-##
+### ---- Pause ---- ###
+
+#####################################
 #### Analyze and visualize data ####
-##
+###################################
 
 # plot the data to look and see if we have any outliers or misentered data we
 # might be concerned about
 water_filt %>%
   ggplot(aes(x = date, y = water_temp_C, color = sample_location)) +
-  geom_point() + geom_line() 
+  geom_line() 
 
-## here is a place to introduce ggplot 
-# cheatsheet: https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf
+# here do another ggplot examples 
 
-# changing the name here to be more specific, also to avoid having the dataframe have the same name as a function 
+
+## here is a place to introduce ggplot cheatsheet: https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf
+
+# we want to visualize annual values, to do this we need to summarize our data and save it as a new dataframe 
 
 # create a dataframe of the summary statistics
 water_summary <- water_filt %>%
@@ -244,7 +246,7 @@ water_summary %>%
   ylab("Mean Water Temperature (°C)")
 
 # could do a reasoning check - based on photo, why do you think monitoring sites 1 and 5 are colder? 
-# could also say something about temp. axis: 5C ~ 41F; 10C ~ 50F
+# could also say something about temp. axis. (5C ~ 41F; 10C ~ 50F)
 
 # if we want to do error bars, separate by site and facet wrap
 water_summary %>%
@@ -296,8 +298,9 @@ water_summary %>%
 # outlier at site 1 
 # could ask questions: why are values dropping over time at monitoring site 2? 
 
+
 # topics covered:
-# cleaning data (removed unneccessary columns and rows with repeated header)
+# cleaning data (removed unnecessary columns and rows with repeated header)
 # summarizing 
 # filtering (example used was to take out the rows with text of col headers in them, not to extract desired values)
 # ggplot - annual time series (point and line)
