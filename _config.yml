@@ -1,2 +1,3 @@
 title: aihec2024
-theme: minimal 
+description: R files for the AIHEC 2024 data science workshop, adopted from the Geoscience Alliance 2022 data science workshop
+theme: minima
