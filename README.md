@@ -1,6 +1,6 @@
 # K_aviCode
 
-This repository contains R files for the AIHEC 2024 data science workshop, adopted from the Geoscience Alliance 2022 data science workshop.. 
+This repository contains R files for the AIHEC 2024 data science workshop, adopted from the Geoscience Alliance 2022 data science workshop.
 
 ## Background Info 
 
@@ -20,7 +20,7 @@ Further, tribes do not have a tool(s) that allows them to evaluate their surface
 
 ## About the data 
 
-This activity is based on a fictional tribe called the K'avi (derived from a powerful medicinal source that gave them energy and cleared their thinking….what you and I call coffee), in order to not single out any indigenous groups. The location is also fictional, but representative of a place with ample surface water, a high elevation stream network fed by glaciers with wetlands and a lake. The photo of the 'reservation' is included below, and is in a remote portion of Banff National Park. The 10 year database is similar to data collected from tribes in Wester Montana. To incorporate the TEK element, a layer of sites adjacent to or near the long-term water quality monitoring sites that were important to the K’avi were added.  Specifically, there is a language camp, lake and river fishing sites, spiritual ceremony site, hunting area, and a site for gathering medicinal foods. 
+This activity is based on a fictional tribe called the K'avi (derived from a powerful medicinal source that gave them energy and cleared their thinking….what you and I call coffee), in order to not single out any indigenous groups. The location is also fictional, but representative of a place with ample surface water, a high elevation stream network fed by glaciers with wetlands and a lake. The photo of the 'reservation' is included below, and is in a remote portion of Banff National Park. The 10 year database is similar to data collected from tribes in Western Montana. To incorporate the TEK element, a layer of sites adjacent to or near the long-term water quality monitoring sites that were important to the K’avi were added.  Specifically, there is a language camp, lake and river fishing sites, spiritual ceremony site, hunting area, and a site for gathering medicinal foods. 
 
 ![Photo of fictional K'avi reservation. Water Quality monitoring sites are marked in blue, and cultural sites are marked in green.](K_aviTribeMap.png)
 
