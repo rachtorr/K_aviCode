@@ -2,29 +2,40 @@
 ## Written by HSK on 8 December 2021
 ## Modified by Cazimir Kowalski
 ## 27 July 2022
-
 ## edited by Rachel Torres  
 ## 24 January 2024 
 
-# clearly state problem and context at the beginning 
-# in this file, we are comparing annual water quality metrics (dissolved oxygen, water temp.) at different sites over time 
-# in order to do this, we first need to clean the dataset and summarize by year 
+
+## in this file, we are comparing annual water quality metrics (dissolved oxygen, water temp.) at different sites over time 
+# in order to do this, we are going to clean a dataset and summarize by year, then plot it to visualize  
+# we are primarily using these key packages through out workshop 
+## tidyverse, lubridate, janitor 
+
+# there will be two main variables we work with in this section: stream temperature and dissolved oxygen
+# water temperature can be meaningful for protecting aquatic communities while maintaining socio-economic benefits (Ouellet-Proulx et al. 2017). Common water temperatures in lakes and streams range between 4 and 35 °C.
+# Dissolved oxygen (DO) is the concentration of oxygen dissolved in water. Common DO concentrations range between 0 and 12 mg L-1 and DO concentrations less than 2 mg L-1 are considered hypoxic
 
 
-##
-#### SET UP R Studio ####
-##
+
+####---SET UP R Studio---####
+
 
 # clear global environment- the global environment is your workspace
 rm(list = ls())
 
-#install necessary packages- packages increase the functionality of R/RStudio
-install.packages('tidyverse', 'lubridate', 'gganimate', 'janitor')
+#install necessary packages- packages increase the functionality of R/RStudio 
+# if you already installed packages, do not need to do this again! 
+install.packages('tidyverse', 'lubridate', 'janitor')
+
 # load necessary libraries- libraries are the installed packages
 library(tidyverse) # used for 'tidying' data: wrangling, analysis, visualizing 
 library(lubridate) # used to handle data as dates 
-library(janitor)   # used to explore and clean data 
-library(gganimate) # what is gganimate used for? 
+library(janitor)   # used to clean data sets
+
+# functions we are learning: 
+# tidyverse: select, filter, mutate, ggplot, summarize 
+# janitor: get_dupes
+# lubridate: mdy, year
 
 # set working directory- the wd is the folder that your related files will be contained in
   # it's important that each class / project has a specific
@@ -32,73 +43,162 @@ library(gganimate) # what is gganimate used for?
 setwd("~/Documents/GitHub/K_aviCode/")
 # if using github project or working from posit cloud, don't need to run setwd()
 
+########################################################################################
+#### start here if you have no experience with any coding ####
+# this section will review some R basics 
 
-# read in CSV file that we want to work with - should be located in your working directory
+# what is coding? for starters, we can do basic math -  run these lines and see output in the console 
+4*5
+12/3+4*5/67+89*10
+(2 + 3)/2
+
+# we can save output by assigning it a name using "<-" to make it an object 
+# the format for all R objects is: object_name <- value 
+
+x <- 4*5 # notice how output does not show up in console, but now you have an object stored in your environment (top right panel)
+
+# type 'x' into the console and hit enter 
+#! Your Turn: add x to 100 and save as a new variable 'y' 
+
+
+# Vectors, which are a list  
+# we can combine multiple objects using c() 
+my_vector <- c(x, 52, 54, 61, 63)
+print(my_vector)
+
+# we can use functions on vectors 
+# the format for functions is: function(object, parameters) 
+# the object is what the function is being done on, and parameters can be any extra information that R needs to run the function 
+# for example: 
+max(my_vector)
+
+#! Your Turn: find the mean() of my_vector 
+
+
+#! Your Turn: create a second vector called "v2" and include 5 values 
+
+
+
+# vectors can also contain characters,  but if they do, the entire list is stored as character 
+v3 <- c("January", "Feb", 3, 4, 5)
+# we can't run math functions on this type of vector because of the characters
+
+
+# when we have multiple vectors, each representing a different variable, they can combine to make a dataset. 
+# here we are using tibble() to make our dataset. We want the following format: each column is a variable, each row is an observation, and each cell is a single value 
+my_tib <- tibble(my_vector, v2)
+
+# sometimes datasests are so large we do not want to print the entire thing in our console. Instead we can preview it with some examples here: 
+str(my_tib)
+head(my_tib)
+summary(my_tib)
+
+# vectors within datasets are referred to with a '$'
+# for example, to get the mean of v2 
+mean(my_tib$v2)
+
+# if we know there are the same number of values, we can add a column this way
+my_tib$v3 <- v3
+
+# datasets can be organized and manipulated in different ways. with tidyverse, we can use a pipe (%>%) which is an operator that takes the dataframe and performs a function on it. Examples are shown below 
+
+# select function: selects variables from dataset and optionally renames
+my_tib_sel <- my_tib %>% select(v2, v3)
+head(my_tib_sel)
+
+# filter function: filters by row, based on criteria that can be equal to (==), not equal to (!=), greater than (>), greater than or equal to (>=), less than (<), or less than or equal to (<=)
+my_tib_filt <- my_tib_sel %>% filter(v3=="January")
+head(my_tib_filt)
+
+# mutate function: mutate creates a new variable that can be based on an existing one 
+my_tib_mut <- my_tib_filt %>% mutate(v4 = v2*2)
+head(my_tib_mut)
+
+# we can condense these lines using the pipe! 
+# for example 
+my_tib_all <- my_tib %>% 
+  select(v2, v3) %>% 
+  filter(v3=="January")  %>% 
+  mutate(v4 = v2*2)
+# compare my_tib_all with my_tib_mut - should be the same because we ran the same functions on them 
+
+#! Your Turn: using select, filter, mutate, or all of the above, create a new dataset from the original my_tib 
+
+
+
+# finally, with tidy datasets we can easily plot our data
+# we will use the ggplot format, which follows:
+## ggplot(dataset) + geom_plottype(aes(x, y))
+
+# for example 
+my_tib_all %>% ggplot() + geom_point(aes(x=v2, y=v4))
+
+#! Yout Turn: try using ggplot for the dataset you created above
+
+
+
+# next you'll put all this new knowledge to practice with a dataset of daily streamflow water quality for different monitoring sites - this has more points than our practice one, but all the functions are used in the same way! 
+
+
+# ----------------------------------------------------------------------------------------
+#### start here if you already have some experience with R or another programming language ####
+# ----------------------------------------------------------------------------------------
+
+
+# before we dive into the data cleaning part, load this data and let's see a plot 
+water_filt <- readr::read_csv("K'avi Tribe Water Quality Dataset_clean.csv")
+
+# run this line for plot
+water_filt %>%
+  ggplot(aes(x = date, y = water_temp_C, color = sample_location)) +
+  geom_line() + geom_point() +
+  theme_minimal()
+
+# in order to get to this point where we can explore visually, we first have to clean our original data set 
+
+
+# starting at the very beginning! 
+# read in CSV file that we want to work with - should be located in your working director
 water <- read.csv("K_avi Tribe Water Quality Dataset.csv")
+# to see what the dataset looks like, use View()
+View(water)
 
-##
-#### Examine Dataset ####
-##
 
-# str() and glimpse() are functions. we input our data set and they return an output to examine the structure of the dataset
+####---Examine Dataset---####
+
+# str() is a function that gives us the structure of an object in R, here we use it to examine the structure of our dataset 
 str(water)
-glimpse(water)
 
-# would also encourage them to use View(water) so that they can see it's like excel data 
-# or also head(water)
+# note that it is displaying the type of data in each column:
+## chr stands for character vector, or string - when printed, this type of data will have quotation marks
+## logi is short for 'logical' which can contain True or False, but in our case NA 
 
 # how many rows and how many columns are there?
 # what type of data are in each column? is that what you'd expect?
-  # despite most of the columns containing what should just be numeric data
-  # all of the columns are filled with data that's a character. this suggests
-  # we should take a closer look at what is in each of these columns
+    # despite most of the columns containing what should just be numeric data all of the columns are filled with data that's a character. this suggests we should take a closer look at what is in each of these columns
 # what are other problems that you're seeing with this dataset?
 
+# we can also preview the first 6 lines of the dataset by using head()
+head(water)
 
 
-#######################
-#### Clean Up Data ####
-#######################
+####---Clean Up Data---####
+# In this section, we are cleaning up the data and making it easier to work with 
 
-## rename column names
-# see what names of columns are
-names(water)
-# there are 20 columns, but only 9 of them contain data (NA means Not Available)
+# we are working to make our dataset 'tidy' in that it follows:
+## each variable is a column
+## each observation is a row 
+## each value is a single cell 
 
-# the output of names(water) is a list 
-# we can make our own lists using c(); 
-# for example here is list, na_names, of the names of columns we don't want 
-na_names <- c("X", "X.1", "X.2", "X.3", "X.4", "X.5", "X.6", "X.7",
-  "X.8", "X.9", "X.10")
-na_names
-
-# remove the 11 unnecessary columns 2 ways
-
-# 1) you can use Tidyverse and the column names specifically to remove the columns
-
-### select() is a tidyverse function, the minus sign means we are NOT selecting 
-water_clean <- water %>% 
-  select(-all_of(na_names))
-
-# for tidyverse functions, we can use a pipe (%>%) which is an operator that takes the dataframe and performs a function on it 
-
-# we can also do this with the janitor package, remove_empty() which identifies NAs and removes
-water_clean <- water %>% 
-  remove_empty("cols")
-
-# now look at your data water_clean using one of the previous functions 
-
+# first we are going to select the columns we want (not including the empty NA columns) and rename the columns to easier names 
 # why change names? 
-### - it's easier to not have uppercase letters 
+### - it's easier to not have uppercase letters (R is case sensitive)
 ### - we want it to be all one word with no spaces or periods 
-### - standard practice is _ and not . between words 
-
-# here we can use clean_names() from janitor library
-water_clean <- clean_names(water_clean)
-
-
-# we can also do this manually by using select() from tidyverse, and rename the columns selected
 ### - some words we might want to shorten i.e. temperature = 'temp'
+
+# here we are using select() from tidyverse package 
+?select
+# this allows us to select the columns we want and rename them in the process 
 water_tidy <- water %>%
   select(sample_location = "Sample.Location",
          longitude = "Longitude",
@@ -110,134 +210,127 @@ water_tidy <- water %>%
          specific_conductivity = "Specific.Conductance.umhos",
          discharge = "Discharge.ft3.sec")
 
-# we will work with tidy going forward, can delete water_clean example - they are the same just different column names 
-rm(water_clean)
+#! Your Turn: check how this has changed using either head() or str() from above 
+
 
 
 # let's look at the summarized dataset  
-summary(water_tidy) # when we run summary, all columns that we want to be numeric are listed as characters - why? 
+summary(water_tidy) 
+# when we run summary, variables we expect to be numeric are listed as characters - why? 
+# sometimes this happens if there is a row that contains character data mixed in with the numeric data 
 
-# here we could manually look for the repeated column headers that are throughout
-# the dataset OR we could use text recognition to find these rows
-# rows we're concerned about: 133, 266, 399, 532. <-- how did we know this? 
+# we need our columns to be numeric so we can run analysis and make plots - you get an error if they are characters
+plot(water_tidy$date, water_tidy$DO)
 
-# identify duplicates 
-get_dupes(water_tidy) # this is a function from janitor to identify any duplicated rows 
+# we will check for and identify any duplicates here using the function get_dupes from janitor
+?get_dupes 
+
+get_dupes(water_tidy)
 # in the output we see that despite having mostly numeric values, the lines that are duplicated have the col names listed again - we want to remove these 
 
-
-# 1) you can use Tidyverse to remove all the rows that have specific text in a specific column
-## introduce filter() here 
+# to remove these rows, we use filter() from tidyverse  
+# filter function takes a criteria for a column and checks whether it is true or not, here "!=" means it is not equal to 
 water_filt <- water_tidy %>%
-  filter(sample_location != "Sample Location") # filter function takes a criteria for a column and checks whether it is true or not, here "!=" means it is not equal to 
+  filter(sample_location != "Sample Location") 
+# now check if duplicates were removed 
+get_dupes(water_filt)
 
 # run summary again
 summary(water_filt)
-
-# dates in R are a separate data category 
-## fix dates that are incorrect
-water_filt$date <- mdy(water_filt$date) # mdy() is a function from lubridate package
-# now run summary again and look at 'date' column
-summary(water_filt)
-
+# our numeric variables are still stored as characters, we need to change this 
 
 ## fix structure of each column as we'll need it for analysis
-#  even though we removed the col names with characters, DO, water_temp_C, water_temp_F, specific_conductivity, discharge are all columns that need to be numeric values ]
+#  even though we removed the col names with characters, DO, water_temp_C, water_temp_F, specific_conductivity, discharge are all columns that need to be numeric values 
 # we can do this using tidyverse function mutate 
-water_filt <- water_filt %>% mutate(
+?mutate
+
+water_num <- water_filt %>% mutate(
   DO = as.numeric(DO),
-  water_temp_C = as.numeric(water_temp_C),
-  water_temp_F = as.numeric(water_temp_F),
-  specific_conductivity = as.numeric(specific_conductivity),
-  discharge = as.numeric(discharge)
+  water_temp_C = as.numeric(water_temp_C)
 )
 
+# see the difference
+summary(water_num)
+
+#! Your Turn: can you use mutate to change the other variables (water_temp_F, specific_conductivity, discharge) to numeric? Save it as the same dataframe, 'water_num'
+
+
+
+
+
+# dates in R are a separate data category 
+## fix dates that are incorrect with mdy() from lubridate package
+?mdy
+water_num$date <- mdy(water_num$date) 
+
+#! Your Turn: run summary again and look at 'date' column, which was previously a character
+
+
+
+# remember how we got an error when we tried to plot before? now that we have proper date and numeric columns, try again 
+plot(water_num$date, water_num$DO)
 
 # confirm structure of all columns in dataframe
-str(water_filt) # note the type of data we now have - character, date, numeric - does it make sense which is which ? 
-summary(water_filt)
+str(water_num) # note the type of data we now have - character, date, numeric - does it make sense which is which ? 
 
 ## create a column just including the year
-# for analysis we'll need to group data by year, so let's make one more column
+# for future analysis we'll need to group data by year, so let's make one more column
 # that is the year the sample was collected
 # because our date column is the type 'Date', we can use the 'year' function from lubridate to extract the year and make it another column 
-water_filt$year <- year(water_filt$date) 
-# this is another case where mutate can be used 
-water_filt <- water_filt %>% mutate(year = year(date))
+water_num$year <- year(water_num$date) 
 
 ## again look at data to see how it has been changed 
+str(water_num)
 
 # write the data frame as another CSV so this cleaned data set can be used
 # for other analyses
-write.csv(water_filt, file = "K'avi Tribe Water Quality Dataset_clean.csv")
+write.csv(water_num, file = "K'avi Tribe Water Quality Dataset_clean.csv")
 
 
-### ---- Pause ---- ###
+####---Analyze and visualize data---####
 
-#####################################
-#### Analyze and visualize data ####
-###################################
+# if you need to re-load your clean dataset, do that here
+water_num <- readr::read_csv("K'avi Tribe Water Quality Dataset_clean.csv")
 
-# plot the data to look and see if we have any outliers or misentered data we
-# might be concerned about
-water_filt %>%
+# plot the data to look and see if we have any outliers or misentered data we might be concerned about
+water_num %>%
   ggplot(aes(x = date, y = water_temp_C, color = sample_location)) +
   geom_line() 
 
-# here do another ggplot examples 
+# ggplot can be used to do many different types of plots 
+# the general format is: 
+# ggplot(data, aes(x, y)) + geom_plottype
+# see options for plot types at the ggplot cheatsheet: https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf
+
+# when exploring data, it's good to look at distribution of it 
+# we can do this with boxplots, histograms, density plots - try those here
+water_num %>% 
+  ggplot(aes(x=sample_location, y=water_temp_C)) + geom_boxplot()
+
+#! Your Turn: try different plot here using same formula 
 
 
-## here is a place to introduce ggplot cheatsheet: https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf
 
-# we want to visualize annual values, to do this we need to summarize our data and save it as a new dataframe 
+# we want to visualize annual values, to do this we need to summarize our data and store it as a new dataset  
 
 # create a dataframe of the summary statistics
-water_summary <- water_filt %>%
+water_ann_mean <- water_num %>%
   # group the data first by sampling location and then year
-  group_by(sample_location, year) %>%
+ group_by(sample_location, year) %>%
   # summarize the data
-  # structure of summarize = (new_column_name = function(column from water df))
-  summarize(# calculate the mean
-            mean_temp = mean(water_temp_C),
-            mean_DO = mean(DO),
-            # calculate the median
-            median_temp = median(water_temp_C),
-            median_DO = median(DO),
-            # calculate the minimum
-            min_temp = min(water_temp_C),
-            min_DO = min(DO),
-            # calculate the maximum
-            max_temp = max(water_temp_C),
-            max_DO = max(DO),
-            # calculate the standard deviation
-            sd_temp = sd(water_temp_C),
-            sd_DO = sd(DO),
-            # calculate the number of observations
-            n_temp = length(water_temp_C),
-            n_DO = length(DO),
-            # calculate the standard error
-            se_temp = sd_temp / sqrt(n_temp),
-            se_DO = sd_DO / sqrt(n_DO)
-            )
+  # summarize() along with across() can be used to apply a function to multiple columns, in our case we use mean, but could change or add to this 
+  summarize(across(c(DO, water_temp_C, specific_conductivity, discharge), list(mean=mean))) 
 
-# compared with previous data frame water_filt, what is different?
-# we summarised the data, how many rows are there now, how many variables? 
-str(water_summary)
+# we summarized the data by year, how has the structure changed? 
+str(water_ann_mean)
 
 # plot the water mean water temperature data
 # call the dataframe you want to use
-water_summary %>%
+water_ann_mean %>%
   # assign the x, y variables, and grouping to color the data
-  ggplot(aes(x = year, y = mean_temp, color = sample_location)) +
-  # use geom_point to plot a data point for each year
+  ggplot(aes(x = year, y = water_temp_C_mean, color = sample_location)) +
+  # use geom_point to plot a data point for each year, connect with line
   geom_point() + geom_line() +
-
-  #geom_errorbar(aes(ymin = mean_temp - se_temp, ymax = mean_temp + se_temp),
-   #             width=.2,
-    #            position=position_dodge(0.05))
-  # Georgia: I tried adding SE bars to the plot and it ended up just becoming overwhelming,
-  # so it's probably something we don't want to include
-
   # pick a theme to clean up plot
   theme_bw() +
   # add plot and axis titles
@@ -245,65 +338,26 @@ water_summary %>%
   xlab("Year") +
   ylab("Mean Water Temperature (°C)")
 
-# could do a reasoning check - based on photo, why do you think monitoring sites 1 and 5 are colder? 
-# could also say something about temp. axis. (5C ~ 41F; 10C ~ 50F)
+# Do a reasoning check - based on photo of the monitoring sites, why do you think monitoring sites 1 and 5 are colder? 
+# temp conversion 5C ~ 41F; 10C ~ 50F
 
-# if we want to do error bars, separate by site and facet wrap
-water_summary %>%
-  # assign the x, y variables, and grouping to color the data
-  ggplot(aes(x = year, y = mean_temp, color = sample_location)) +
-  # use geom_point to plot a data point for each year
-  geom_point() + 
-  # visualizing uncertainty with se 
-  geom_errorbar(aes(ymin = mean_temp - se_temp, ymax = mean_temp + se_temp, col=sample_location)) + 
-  # pick a theme to clean up plot
-  theme_bw() +
-  # add plot and axis titles
-  ggtitle("K'avi Tribe Mean Annual Water Temperature") +
-  xlab("Year") +
-  ylab("Mean Water Temperature (°C)") + facet_wrap('sample_location', nrow=1)
 
 
 # plot the mean DO data - why do we care about DO? what is it? 
 # important for water quality, aquatic life needs DO, but not too much or too little. levels below 5mg/L are low enough to stress out fish 
 # Link to EPA description: https://www.epa.gov/national-aquatic-resource-surveys/indicators-dissolved-oxygen#:~:text=Dissolved%20oxygen%20(DO)%20is%20the,of%20a%20pond%20or%20lake.
 
-# call the dataframe you want to use
-water_summary %>%
-  # assign the x, y variables, and grouping to color the data
-  ggplot(aes(x = year, y = mean_DO, color = sample_location)) +
-  # use geom_point to plot a data point for each year
-  geom_point() + geom_line() + 
-  # pick a theme to clean up plot
-  theme_bw() +
-  # add plot and axis titles
-  ggtitle("K'avi Tribe Mean Annual Water Dissolved Oxygen") +
-  xlab("Year") +
-  ylab("Mean Dissolved Oxygen")
-
-# can show the error bars for this as well 
-water_summary %>%
-  # assign the x, y variables, and grouping to color the data
-  ggplot(aes(x = year, y = mean_DO, color = sample_location)) +
-  # use geom_point to plot a data point for each year
-  geom_point() + 
-  # visualizing uncertainty with se 
-  geom_errorbar(aes(ymin = mean_DO - se_DO, ymax = mean_DO + se_DO, col=sample_location)) + 
-  # pick a theme to clean up plot
-  theme_bw() +
-  # add plot and axis titles
-  ggtitle("K'avi Tribe Mean Annual Water Temperature") +
-  xlab("Year") +
-  ylab("Mean Water Temperature (°C)") + facet_wrap('sample_location', nrow=1)
-# outlier at site 1 
-# could ask questions: why are values dropping over time at monitoring site 2? 
+#! Your Turn: plot the annual average DO here 
 
 
+
+
+####---Finished with part 1---####
 # topics covered:
 # cleaning data (removed unnecessary columns and rows with repeated header)
-# summarizing 
 # filtering (example used was to take out the rows with text of col headers in them, not to extract desired values)
-# ggplot - annual time series (point and line)
+# summarizing by year
+# ggplot - time series and boxplot 
 
 
 
