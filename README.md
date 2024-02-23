@@ -74,7 +74,7 @@ You are ready to get started with the first R activity: 1-Kavi_Tribe_Water_Quali
 
 ## Acknowledgements 
 
-This activity was first created by Georgia Smies at SKC, and developed by Helena S. Kleiner. It was later modified by Cazimir Kowalski. The text for setting up R studio was adopted from the [MacrosystemsEDDIE Teaching Materials](https://macrosystemseddie.github.io/module1) in 'R You Ready for EDDIE? Module 1'. This work is part of an ongoing project to develop Indigenous data science educational tools with the [Ecological Forecasting Initiative](https://ecoforecast.org/).
+This activity was first created by Georgia Smies at Salish-Kootenai College, and developed by Helena S. Kleiner at University of Notre Dame. It was later modified by Cazimir Kowalski, also from University of Notre Dame. The text for setting up R studio was adopted from the [MacrosystemsEDDIE Teaching Materials](https://macrosystemseddie.github.io/module1) in 'R You Ready for EDDIE? Module 1'. This work is part of an ongoing project to develop Indigenous data science educational tools with the [Ecological Forecasting Initiative](https://ecoforecast.org/).
 
 For presentation at the AIHEC/NFEWS 2024 meeting, this work is supported by funding from the following: the Computer Science Department, University of Minnesota (with support from NSF award 1901099),  the Native Food, Energy, and Water Security INCLUDES Alliance (NSF award 2120035); the Environmental Change Initiative, University of Notre Dame; the Alfred P. Sloan Foundation and the Geoscience Alliance (NSF award 2039341). 
      
