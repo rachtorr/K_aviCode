@@ -11,7 +11,7 @@
 # we are primarily using these key packages through out workshop 
 ## tidyverse, lubridate, janitor 
 
-# there will be two main variables we work with in this section: stream temperature and dissolved oxygen
+# There are two main variables we work with in this section: stream temperature and dissolved oxygen
 # water temperature can be meaningful for protecting aquatic communities while maintaining socio-economic benefits (Ouellet-Proulx et al. 2017). Common water temperatures in lakes and streams range between 4 and 35 °C.
 # Dissolved oxygen (DO) is the concentration of oxygen dissolved in water. Common DO concentrations range between 0 and 12 mg L-1 and DO concentrations less than 2 mg L-1 are considered hypoxic
 
@@ -36,14 +36,6 @@ library(janitor)   # used to clean data sets
 # tidyverse: select, filter, mutate, ggplot, summarize 
 # janitor: get_dupes
 # lubridate: mdy, year
-
-# set working directory- the wd is the folder that your related files will be contained in
-  # it's important that each class / project has a specific
-  # folder on your computer to maintain organization
-# if using Rproject, don't need to run setwd()
-# to check where your current folder is, run
-getwd() 
-setwd("Your/Path/Here")
 
 
 # ----------------------------------------------------------------------------
