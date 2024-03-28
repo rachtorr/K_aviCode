@@ -1,0 +1,5 @@
+Department of Water Resources (DWR) makes no warranties or guarantees - either expressed or implied - as to the completeness, accuracy, or correctness of the data herein (subject data). DWR neither accepts nor assumes liability arising from or for any incorrect, incomplete, or misleading subject data or reproductions of the subject data. Users are prohibited from any commercial, non-free resale, or redistribution without explicit written permission from DWR. Users should acknowledge DWR as the source used in the creation of any reports, publications, new data sets, derived products, or services resulting from the use of the subject data. DWR expressly disclaims any responsibility to defend or indemnify users against claims of others based on users’ copying, reliance, distribution, or other use of any of the subject data. 
+ 
+The subject data may include data from National Hydrography Dataset. Any data from U.S. Government sources is subject to any conditions, disclaimers, or other restrictions specified by the sources.
+ 
+I've read the disclaimer; go to the Data Set.
